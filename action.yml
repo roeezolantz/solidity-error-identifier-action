@@ -49,8 +49,12 @@ inputs:
   npm-binary-name:
     description: '[NPM] Binary command name (e.g., "my-error-lookup"). Defaults to package name without scope.'
     required: false
+  npm-provenance:
+    description: '[NPM] Enable NPM provenance (Trusted Publishing via OIDC). Recommended over using npm-token.'
+    required: false
+    default: 'false'
   npm-token:
-    description: '[NPM] NPM authentication token for publishing'
+    description: '[NPM] NPM authentication token for publishing (not needed if npm-provenance is enabled)'
     required: false
   npm-registry:
     description: '[NPM] NPM registry URL'

@@ -7,8 +7,9 @@ export interface PublishOptions {
     version?: string;
     description?: string;
     errorsJson: string;
-    npmToken: string;
+    npmToken?: string;
     registry?: string;
+    useProvenance?: boolean;
 }
 export interface PublishResult {
     success: boolean;

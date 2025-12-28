@@ -13,8 +13,9 @@ export interface PublishOptions {
 	version?: string;
 	description?: string;
 	errorsJson: string;
-	npmToken: string;
+	npmToken?: string; // Optional when using provenance/trusted publishing
 	registry?: string;
+	useProvenance?: boolean; // Enable NPM provenance (trusted publishing)
 }
 
 export interface PublishResult {
@@ -279,23 +280,33 @@ Version: ${version}
 
 		fs.writeFileSync(path.join(packageDir, 'README.md'), readme);
 
-		// Configure npm registry and auth
-		const npmrcPath = path.join(packageDir, '.npmrc');
-		const registryUrl = options.registry || 'https://registry.npmjs.org/';
-		const registryHost = new URL(registryUrl).host;
+		// Configure npm registry and auth (only if using token)
+		if (options.npmToken) {
+			const npmrcPath = path.join(packageDir, '.npmrc');
+			const registryUrl = options.registry || 'https://registry.npmjs.org/';
+			const registryHost = new URL(registryUrl).host;
 
-		fs.writeFileSync(npmrcPath, `//${registryHost}/:_authToken=\${NPM_TOKEN}\n`);
+			fs.writeFileSync(npmrcPath, `//${registryHost}/:_authToken=\${NPM_TOKEN}\n`);
+		}
 
 		core.info(`Publishing ${options.packageName}@${version}...`);
+		if (options.useProvenance) {
+			core.info('Using NPM Provenance (Trusted Publishing)');
+		}
 		core.info('');
 
-		// Publish
-		execSync('npm publish --access public', {
+		// Publish with optional provenance
+		const publishFlags = ['--access public'];
+		if (options.useProvenance) {
+			publishFlags.push('--provenance');
+		}
+
+		execSync(`npm publish ${publishFlags.join(' ')}`, {
 			cwd: packageDir,
 			stdio: 'inherit',
 			env: {
 				...process.env,
-				NPM_TOKEN: options.npmToken
+				...(options.npmToken && { NPM_TOKEN: options.npmToken })
 			}
 		});
 

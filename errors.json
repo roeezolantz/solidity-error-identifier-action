@@ -1,0 +1,382 @@
+[
+  {
+    "name": "OwnableUnauthorizedAccount",
+    "signature": "OwnableUnauthorizedAccount(address)",
+    "inputs": [
+      "account"
+    ],
+    "inputTypes": [
+      "address"
+    ],
+    "source": "ACL",
+    "selector": "0x118cdaa7"
+  },
+  {
+    "name": "OwnableInvalidOwner",
+    "signature": "OwnableInvalidOwner(address)",
+    "inputs": [
+      "owner"
+    ],
+    "inputTypes": [
+      "address"
+    ],
+    "source": "ACL",
+    "selector": "0x1e4fbdf7"
+  },
+  {
+    "name": "InvalidSecurityZone",
+    "signature": "InvalidSecurityZone(int32,int32,int32)",
+    "inputs": [
+      "zone",
+      "min",
+      "max"
+    ],
+    "inputTypes": [
+      "int32",
+      "int32",
+      "int32"
+    ],
+    "source": "TaskManager",
+    "selector": "0x24cbcf36"
+  },
+  {
+    "name": "TooManyInputs",
+    "signature": "TooManyInputs(string,uint256,uint256)",
+    "inputs": [
+      "operation",
+      "got",
+      "maxAllowed"
+    ],
+    "inputTypes": [
+      "string",
+      "uint256",
+      "uint256"
+    ],
+    "source": "TaskManager",
+    "selector": "0x2b0399d5"
+  },
+  {
+    "name": "SenderCannotBeDelegateeAddress",
+    "signature": "SenderCannotBeDelegateeAddress()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0x30dc9203"
+  },
+  {
+    "name": "DirectAllowForbidden",
+    "signature": "DirectAllowForbidden(address)",
+    "inputs": [
+      "sender"
+    ],
+    "inputTypes": [
+      "address"
+    ],
+    "source": "ACL",
+    "selector": "0x3809a243"
+  },
+  {
+    "name": "PermissionInvalid_IssuerSignature",
+    "signature": "PermissionInvalid_IssuerSignature()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0x4c40eccb"
+  },
+  {
+    "name": "ERC1967InvalidImplementation",
+    "signature": "ERC1967InvalidImplementation(address)",
+    "inputs": [
+      "implementation"
+    ],
+    "inputTypes": [
+      "address"
+    ],
+    "source": "ACL",
+    "selector": "0x4c9c8ce3"
+  },
+  {
+    "name": "ACLNotAllowed",
+    "signature": "ACLNotAllowed(uint256,address)",
+    "inputs": [
+      "handle",
+      "account"
+    ],
+    "inputTypes": [
+      "uint256",
+      "address"
+    ],
+    "source": "TaskManager",
+    "selector": "0x4d13139e"
+  },
+  {
+    "name": "InvalidTypeOrSecurityZone",
+    "signature": "InvalidTypeOrSecurityZone(string)",
+    "inputs": [
+      "operation"
+    ],
+    "inputTypes": [
+      "string"
+    ],
+    "source": "TaskManager",
+    "selector": "0x52b50ae1"
+  },
+  {
+    "name": "DecryptionResultNotReady",
+    "signature": "DecryptionResultNotReady(uint256)",
+    "inputs": [
+      "ctHash"
+    ],
+    "inputTypes": [
+      "uint256"
+    ],
+    "source": "TaskManager",
+    "selector": "0x70cf6554"
+  },
+  {
+    "name": "InvalidSigner",
+    "signature": "InvalidSigner(address,address)",
+    "inputs": [
+      "signer",
+      "expectedSigner"
+    ],
+    "inputTypes": [
+      "address",
+      "address"
+    ],
+    "source": "TaskManager",
+    "selector": "0x7ba5ffb5"
+  },
+  {
+    "name": "InvalidInputType",
+    "signature": "InvalidInputType(uint8,uint8)",
+    "inputs": [
+      "actual",
+      "expected"
+    ],
+    "inputTypes": [
+      "uint8",
+      "uint8"
+    ],
+    "source": "TaskManager",
+    "selector": "0x884a0e9d"
+  },
+  {
+    "name": "InvalidSignature",
+    "signature": "InvalidSignature()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "TaskManager",
+    "selector": "0x8baa579f"
+  },
+  {
+    "name": "PermissionInvalid_RecipientSignature",
+    "signature": "PermissionInvalid_RecipientSignature()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0x8e143bf7"
+  },
+  {
+    "name": "InvalidInputForFunction",
+    "signature": "InvalidInputForFunction(string,uint8)",
+    "inputs": [
+      "functionName",
+      "inputType"
+    ],
+    "inputTypes": [
+      "string",
+      "uint8"
+    ],
+    "source": "TaskManager",
+    "selector": "0x91b4b378"
+  },
+  {
+    "name": "RandomFunctionNotSupported",
+    "signature": "RandomFunctionNotSupported()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "TaskManager",
+    "selector": "0x98e08ab0"
+  },
+  {
+    "name": "AddressEmptyCode",
+    "signature": "AddressEmptyCode(address)",
+    "inputs": [
+      "target"
+    ],
+    "inputTypes": [
+      "address"
+    ],
+    "source": "ACL",
+    "selector": "0x9996b315"
+  },
+  {
+    "name": "InvalidInputsAmount",
+    "signature": "InvalidInputsAmount(string,uint256,uint256)",
+    "inputs": [
+      "operation",
+      "got",
+      "expected"
+    ],
+    "inputTypes": [
+      "string",
+      "uint256",
+      "uint256"
+    ],
+    "source": "TaskManager",
+    "selector": "0x9a84351c"
+  },
+  {
+    "name": "OnlyAggregatorAllowed",
+    "signature": "OnlyAggregatorAllowed(address)",
+    "inputs": [
+      "caller"
+    ],
+    "inputTypes": [
+      "address"
+    ],
+    "source": "TaskManager",
+    "selector": "0xa974a0fe"
+  },
+  {
+    "name": "UUPSUnsupportedProxiableUUID",
+    "signature": "UUPSUnsupportedProxiableUUID(bytes32)",
+    "inputs": [
+      "slot"
+    ],
+    "inputTypes": [
+      "bytes32"
+    ],
+    "source": "ACL",
+    "selector": "0xaa1d49a4"
+  },
+  {
+    "name": "InvalidOperationInputs",
+    "signature": "InvalidOperationInputs(string)",
+    "inputs": [
+      "operation"
+    ],
+    "inputTypes": [
+      "string"
+    ],
+    "source": "TaskManager",
+    "selector": "0xb31612aa"
+  },
+  {
+    "name": "ERC1967NonPayable",
+    "signature": "ERC1967NonPayable()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xb398979f"
+  },
+  {
+    "name": "PermissionInvalid_Disabled",
+    "signature": "PermissionInvalid_Disabled()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xcbd3a966"
+  },
+  {
+    "name": "SenderNotAllowed",
+    "signature": "SenderNotAllowed(address)",
+    "inputs": [
+      "sender"
+    ],
+    "inputTypes": [
+      "address"
+    ],
+    "source": "ACL",
+    "selector": "0xd0d25976"
+  },
+  {
+    "name": "AlreadyDelegated",
+    "signature": "AlreadyDelegated()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xd1860468"
+  },
+  {
+    "name": "FailedCall",
+    "signature": "FailedCall()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xd6bda275"
+  },
+  {
+    "name": "ECDSAInvalidSignatureS",
+    "signature": "ECDSAInvalidSignatureS(bytes32)",
+    "inputs": [
+      "s"
+    ],
+    "inputTypes": [
+      "bytes32"
+    ],
+    "source": "TaskManager",
+    "selector": "0xd78bce0c"
+  },
+  {
+    "name": "NotInitializing",
+    "signature": "NotInitializing()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xd7e6bcf8"
+  },
+  {
+    "name": "UUPSUnauthorizedCallContext",
+    "signature": "UUPSUnauthorizedCallContext()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xe07c8dba"
+  },
+  {
+    "name": "InvalidAddress",
+    "signature": "InvalidAddress()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "TaskManager",
+    "selector": "0xe6c4247b"
+  },
+  {
+    "name": "PermissionInvalid_Expired",
+    "signature": "PermissionInvalid_Expired()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xed0764a1"
+  },
+  {
+    "name": "ECDSAInvalidSignature",
+    "signature": "ECDSAInvalidSignature()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "TaskManager",
+    "selector": "0xf645eedf"
+  },
+  {
+    "name": "InvalidInitialization",
+    "signature": "InvalidInitialization()",
+    "inputs": [],
+    "inputTypes": [],
+    "source": "ACL",
+    "selector": "0xf92ee8a9"
+  },
+  {
+    "name": "ECDSAInvalidSignatureLength",
+    "signature": "ECDSAInvalidSignatureLength(uint256)",
+    "inputs": [
+      "length"
+    ],
+    "inputTypes": [
+      "uint256"
+    ],
+    "source": "TaskManager",
+    "selector": "0xfce698f7"
+  }
+]

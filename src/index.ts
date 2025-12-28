@@ -117,11 +117,18 @@ async function run(): Promise<void> {
 		const publishNpm = core.getInput('publish-npm') === 'true';
 		if (publishNpm) {
 			const npmPackageName = core.getInput('npm-package-name', { required: true });
-			const npmToken = core.getInput('npm-token', { required: true });
+			const useProvenance = core.getInput('npm-provenance') === 'true';
+			const npmToken = core.getInput('npm-token') || undefined;
 			const npmBinaryName = core.getInput('npm-binary-name') || undefined;
 			const npmRegistry = core.getInput('npm-registry') || undefined;
 			const packageVersion = core.getInput('package-version') || undefined;
 			const packageDescription = core.getInput('package-description') || undefined;
+
+			// Validate: either provenance or token must be provided
+			if (!useProvenance && !npmToken) {
+				core.setFailed('Either npm-provenance must be enabled or npm-token must be provided');
+				return;
+			}
 
 			core.info('');
 			const publishResult = await publishToNpm({
@@ -131,7 +138,8 @@ async function run(): Promise<void> {
 				description: packageDescription,
 				errorsJson: outputFile,
 				npmToken: npmToken,
-				registry: npmRegistry
+				registry: npmRegistry,
+				useProvenance: useProvenance
 			});
 
 			if (publishResult.success) {
