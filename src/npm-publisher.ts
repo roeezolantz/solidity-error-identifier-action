@@ -204,8 +204,14 @@ export async function publishToNpm(options: PublishOptions): Promise<PublishResu
 		// Determine binary name
 		const binaryName = options.binaryName || options.packageName.replace(/^@[^/]+\//, '');
 
+		// Get repository information from GitHub Actions environment
+		const githubRepository = process.env.GITHUB_REPOSITORY; // e.g., "owner/repo"
+		const repositoryUrl = githubRepository
+			? `https://github.com/${githubRepository}`
+			: undefined;
+
 		// Create package.json
-		const packageJson = {
+		const packageJson: any = {
 			name: options.packageName,
 			version: version,
 			description: options.description || 'Error decoder for Solidity smart contracts',
@@ -231,6 +237,14 @@ export async function publishToNpm(options: PublishOptions): Promise<PublishResu
 				registry: options.registry || 'https://registry.npmjs.org/'
 			}
 		};
+
+		// Add repository field for provenance (required for npm publish --provenance)
+		if (repositoryUrl) {
+			packageJson.repository = {
+				type: 'git',
+				url: `git+${repositoryUrl}.git`
+			};
+		}
 
 		fs.writeFileSync(
 			path.join(packageDir, 'package.json'),

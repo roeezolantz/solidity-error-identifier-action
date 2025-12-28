@@ -214,6 +214,11 @@ async function publishToNpm(options) {
         }
         // Determine binary name
         const binaryName = options.binaryName || options.packageName.replace(/^@[^/]+\//, '');
+        // Get repository information from GitHub Actions environment
+        const githubRepository = process.env.GITHUB_REPOSITORY; // e.g., "owner/repo"
+        const repositoryUrl = githubRepository
+            ? `https://github.com/${githubRepository}`
+            : undefined;
         // Create package.json
         const packageJson = {
             name: options.packageName,
@@ -241,6 +246,13 @@ async function publishToNpm(options) {
                 registry: options.registry || 'https://registry.npmjs.org/'
             }
         };
+        // Add repository field for provenance (required for npm publish --provenance)
+        if (repositoryUrl) {
+            packageJson.repository = {
+                type: 'git',
+                url: `git+${repositoryUrl}.git`
+            };
+        }
         fs.writeFileSync(path.join(packageDir, 'package.json'), JSON.stringify(packageJson, null, 2));
         // Copy errors.json
         fs.copyFileSync(options.errorsJson, path.join(packageDir, 'errors.json'));
