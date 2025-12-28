@@ -1,0 +1,29 @@
+{
+  "name": "solidity-error-identifier-action",
+  "version": "1.0.0",
+  "description": "GitHub Action to extract custom errors from Solidity contract ABIs",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc && ncc build dist/index.js -o dist --source-map --license licenses.txt",
+    "test": "jest"
+  },
+  "keywords": [
+    "github-action",
+    "solidity",
+    "ethereum",
+    "errors",
+    "abi"
+  ],
+  "author": "Fhenix Protocol",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "@actions/github": "^6.0.0",
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vercel/ncc": "^0.38.1",
+    "typescript": "^5.7.0"
+  }
+}

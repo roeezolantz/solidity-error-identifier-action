@@ -1,0 +1,81 @@
+name: 'Solidity Error Identifier'
+description: 'Extract custom errors from Solidity contract ABIs and generate searchable error database'
+author: 'Roee Zolantz'
+
+branding:
+  icon: 'alert-circle'
+  color: 'purple'
+
+inputs:
+  mode:
+    description: 'Mode: "abi" (scan existing ABIs) or "compile" (compile contracts first)'
+    required: false
+    default: 'abi'
+
+  # ABI mode inputs
+  abi-paths:
+    description: '[ABI mode] Comma-separated list of ABI directory paths to scan (e.g., "artifacts/contracts")'
+    required: false
+
+  # Compile mode inputs
+  contract-paths:
+    description: '[Compile mode] Comma-separated list of .sol file or directory paths to compile'
+    required: false
+  compiler:
+    description: '[Compile mode] Compiler to use: "hardhat", "foundry", or "solc"'
+    required: false
+    default: 'hardhat'
+  solidity-version:
+    description: '[Compile mode] Solidity version (e.g., "0.8.25"). Auto-detected if not specified.'
+    required: false
+  compile-args:
+    description: '[Compile mode] Additional compiler arguments (e.g., "--optimize")'
+    required: false
+
+  # Common inputs
+  output-path:
+    description: 'Path where the error database JSON should be written'
+    required: false
+    default: 'errors.json'
+
+  # NPM Publishing inputs
+  publish-npm:
+    description: 'Publish the error database as an npm package with CLI tool (true/false)'
+    required: false
+    default: 'false'
+  npm-package-name:
+    description: '[NPM] Package name to publish (e.g., "@myorg/error-identifier")'
+    required: false
+  npm-binary-name:
+    description: '[NPM] Binary command name (e.g., "my-error-lookup"). Defaults to package name without scope.'
+    required: false
+  npm-token:
+    description: '[NPM] NPM authentication token for publishing'
+    required: false
+  npm-registry:
+    description: '[NPM] NPM registry URL'
+    required: false
+    default: 'https://registry.npmjs.org/'
+  package-version:
+    description: '[NPM] Package version (e.g., "1.0.0"). If not provided, will auto-increment patch version.'
+    required: false
+  package-description:
+    description: '[NPM] Package description'
+    required: false
+    default: 'Error decoder for Solidity smart contracts'
+
+outputs:
+  errors-json:
+    description: 'Path to the generated error database JSON file'
+  error-count:
+    description: 'Total number of errors extracted'
+  errors-by-source:
+    description: 'JSON object with error counts grouped by source contract'
+  npm-package-name:
+    description: 'Published npm package name (if publish-npm was enabled)'
+  npm-package-version:
+    description: 'Published npm package version (if publish-npm was enabled)'
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

@@ -1,0 +1,95 @@
+# Example: Using COMPILE mode - no pre-compiled ABIs needed!
+# The action will compile your contracts for you
+
+name: Extract Errors (Compile Mode)
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'contracts/**/*.sol'
+
+jobs:
+  extract-errors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      # NO COMPILATION STEP NEEDED!
+      # The action will compile the contracts for you
+
+      - name: Extract Errors from .sol files
+        uses: FhenixProtocol/solidity-error-identifier-action@v1
+        with:
+          mode: 'compile'                           # Use compile mode
+          contract-paths: 'contracts'               # Path to .sol files (can be directory or specific files)
+          compiler: 'hardhat'                       # hardhat, foundry, or solc
+          solidity-version: '0.8.25'               # Optional - auto-detected from pragma if not specified
+          output-path: 'errors.json'
+
+      - name: Commit updated errors
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          if ! git diff --quiet errors.json; then
+            git add errors.json
+            git commit -m "chore: update error database"
+            git push
+          fi
+
+# ============================================================================
+# COMPILE MODE EXAMPLES
+# ============================================================================
+
+# Example 1: Compile specific files
+compile-specific-files:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      mode: 'compile'
+      contract-paths: 'contracts/FHE.sol,contracts/ICofhe.sol'
+      compiler: 'hardhat'
+
+# Example 2: Compile entire directory
+compile-directory:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      mode: 'compile'
+      contract-paths: 'contracts'
+      compiler: 'hardhat'
+
+# Example 3: Multiple directories
+compile-multiple:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      mode: 'compile'
+      contract-paths: 'contracts,src'
+      compiler: 'hardhat'
+
+# Example 4: Using Foundry
+compile-foundry:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      mode: 'compile'
+      contract-paths: 'src'
+      compiler: 'foundry'
+
+# Example 5: Using standalone solc
+compile-solc:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      mode: 'compile'
+      contract-paths: 'contracts/MyContract.sol'
+      compiler: 'solc'
+      solidity-version: '0.8.20'
+
+# Example 6: With additional compiler arguments
+compile-with-args:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      mode: 'compile'
+      contract-paths: 'contracts'
+      compiler: 'hardhat'
+      compile-args: '--force'

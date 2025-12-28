@@ -1,0 +1,64 @@
+# Example workflow for cofhe-contracts repository
+# This shows how to use the solidity-error-identifier-action as a black box
+
+name: Extract and Update Error Database
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'contracts/**/*.sol'
+      - 'contracts/internal/host-chain/contracts/**/*.sol'
+
+jobs:
+  update-errors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      # Step 1: Compile root contracts (FHE.sol, ICofhe.sol)
+      - name: Compile root contracts
+        run: |
+          mkdir -p .temp-sources
+          cp contracts/FHE.sol .temp-sources/
+          cp contracts/ICofhe.sol .temp-sources/
+          npx hardhat compile --config scripts/error-identifier/hardhat-root.config.js
+
+      # Step 2: Compile internal contracts
+      - name: Compile internal contracts
+        run: |
+          cd contracts/internal/host-chain
+          pnpm install
+          test -f .env || cp .env.example .env
+          pnpm run compile
+
+      # Step 3: Extract errors using the action (BLACK BOX!)
+      - name: Extract Errors
+        uses: FhenixProtocol/solidity-error-identifier-action@v1
+        with:
+          abi-paths: 'artifacts/.temp-sources,contracts/internal/host-chain/artifacts/contracts'
+          output-path: 'scripts/error-identifier/dist/errors.json'
+
+      # Step 4: Commit if changed
+      - name: Commit updated errors
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          if ! git diff --quiet scripts/error-identifier/dist/errors.json; then
+            git add scripts/error-identifier/dist/errors.json
+            git commit -m "chore: update error database from contract changes"
+            git push
+          else
+            echo "No changes to error database"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

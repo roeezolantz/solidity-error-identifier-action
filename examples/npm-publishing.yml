@@ -1,0 +1,171 @@
+# Example: Complete workflow with NPM publishing
+# Extracts errors and publishes them as an npm package with CLI tool
+
+name: Extract Errors and Publish to NPM
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'contracts/**/*.sol'
+
+jobs:
+  extract-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      # Compile contracts (if using ABI mode)
+      - name: Compile contracts
+        run: |
+          npm install
+          npx hardhat compile
+
+      # Extract errors AND publish to npm
+      - name: Extract Errors and Publish to NPM
+        uses: FhenixProtocol/solidity-error-identifier-action@v1
+        with:
+          # Error extraction config
+          mode: 'abi'
+          abi-paths: 'artifacts/contracts'
+          output-path: 'errors.json'
+
+          # NPM publishing config
+          publish-npm: 'true'
+          npm-package-name: '@myorg/error-identifier'
+          npm-binary-name: 'my-error-lookup'
+          npm-token: ${{ secrets.NPM_TOKEN }}
+          package-description: 'Error decoder for MyProject contracts'
+          # package-version: '1.0.0'  # Optional - auto-increments if omitted
+
+      - name: Notify success
+        run: |
+          echo "Package published! Users can now run:"
+          echo "  npm install @myorg/error-identifier"
+          echo "  npx my-error-lookup --help"
+
+# ============================================================================
+# NPM PUBLISHING EXAMPLES
+# ============================================================================
+
+# Example 1: Minimal NPM publishing
+minimal-npm:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      abi-paths: 'artifacts'
+      publish-npm: 'true'
+      npm-package-name: '@myorg/errors'
+      npm-token: ${{ secrets.NPM_TOKEN }}
+
+# Example 2: Custom binary name
+custom-binary:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      abi-paths: 'artifacts'
+      publish-npm: 'true'
+      npm-package-name: '@fhenixprotocol/cofhe-errors'
+      npm-binary-name: 'fhenix-error-identifier'  # Custom command name
+      npm-token: ${{ secrets.NPM_TOKEN }}
+
+# Example 3: With specific version
+specific-version:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      abi-paths: 'artifacts'
+      publish-npm: 'true'
+      npm-package-name: '@myorg/errors'
+      npm-token: ${{ secrets.NPM_TOKEN }}
+      package-version: '2.1.0'  # Explicit version
+
+# Example 4: Compile mode + NPM publishing
+compile-and-publish:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      # Compile mode - no ABIs needed!
+      mode: 'compile'
+      contract-paths: 'contracts'
+      compiler: 'hardhat'
+
+      # Publish to NPM
+      publish-npm: 'true'
+      npm-package-name: '@myorg/errors'
+      npm-token: ${{ secrets.NPM_TOKEN }}
+
+# Example 5: Custom registry (private npm)
+custom-registry:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      abi-paths: 'artifacts'
+      publish-npm: 'true'
+      npm-package-name: '@mycompany/errors'
+      npm-token: ${{ secrets.NPM_TOKEN }}
+      npm-registry: 'https://npm.mycompany.com/'
+
+# Example 6: Auto-increment version on every merge
+auto-version:
+  - uses: FhenixProtocol/solidity-error-identifier-action@v1
+    with:
+      abi-paths: 'artifacts'
+      publish-npm: 'true'
+      npm-package-name: '@myorg/errors'
+      npm-token: ${{ secrets.NPM_TOKEN }}
+      # Omit package-version - will auto-increment patch version
+
+# ============================================================================
+# COMPLETE COFHE-CONTRACTS EXAMPLE
+# ============================================================================
+
+cofhe-contracts-complete:
+  name: Extract Errors and Publish
+  on:
+    push:
+      branches:
+        - master
+      paths:
+        - 'contracts/**/*.sol'
+        - 'contracts/package.json'  # Trigger on version bump
+
+  jobs:
+    extract-and-publish:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 20.x
+
+        - uses: pnpm/action-setup@v4
+          with:
+            version: latest
+
+        # Step 1: Compile root contracts
+        - name: Compile root contracts
+          run: |
+            mkdir -p .temp-sources
+            cp contracts/FHE.sol .temp-sources/
+            cp contracts/ICofhe.sol .temp-sources/
+            npx hardhat compile --config hardhat-root.config.js
+
+        # Step 2: Compile internal contracts
+        - name: Compile internal contracts
+          run: |
+            cd contracts/internal/host-chain
+            pnpm install
+            test -f .env || cp .env.example .env
+            pnpm run compile
+
+        # Step 3: Extract errors AND publish to npm
+        - name: Extract and Publish
+          uses: FhenixProtocol/solidity-error-identifier-action@v1
+          with:
+            abi-paths: 'artifacts/.temp-sources,contracts/internal/host-chain/artifacts/contracts'
+            publish-npm: 'true'
+            npm-package-name: '@fhenixprotocol/cofhe-errors'
+            npm-binary-name: 'fhenix-error-identifier'
+            npm-token: ${{ secrets.NPM_TOKEN }}
+            package-description: 'Error decoder for CoFHE protocol contracts'
+            # Version auto-incremented from published package
