@@ -294,13 +294,20 @@ Version: ${version}
 
 		fs.writeFileSync(path.join(packageDir, 'README.md'), readme);
 
-		// Configure npm registry and auth (only if using token)
-		if (options.npmToken) {
-			const npmrcPath = path.join(packageDir, '.npmrc');
-			const registryUrl = options.registry || 'https://registry.npmjs.org/';
-			const registryHost = new URL(registryUrl).host;
+		// Configure npm registry and auth
+		const npmrcPath = path.join(packageDir, '.npmrc');
+		const registryUrl = options.registry || 'https://registry.npmjs.org/';
+		const registryHost = new URL(registryUrl).host;
 
+		if (options.npmToken) {
+			// Use provided token
 			fs.writeFileSync(npmrcPath, `//${registryHost}/:_authToken=\${NPM_TOKEN}\n`);
+		} else if (options.useProvenance) {
+			// When using NPM Trusted Publishers with OIDC (no token provided)
+			// npm will automatically use GitHub Actions OIDC for authentication
+			// We don't create .npmrc to allow npm to use its default OIDC flow
+			core.info('Using NPM Trusted Publishers with GitHub Actions OIDC');
+			core.info('No token provided - npm will use OIDC authentication automatically');
 		}
 
 		core.info(`Publishing ${options.packageName}@${version}...`);
