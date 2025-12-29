@@ -30,6 +30,7 @@ async function run(): Promise<void> {
 			const compiler = (core.getInput('compiler') || 'hardhat') as 'hardhat' | 'foundry' | 'solc';
 			const solidityVersion = core.getInput('solidity-version') || undefined;
 			const compileArgs = core.getInput('compile-args') || undefined;
+			const workingDirectory = core.getInput('working-directory') || undefined;
 
 			const contractPaths = contractPathsInput.split(',').map(p => p.trim());
 
@@ -38,7 +39,8 @@ async function run(): Promise<void> {
 				contractPaths,
 				compiler,
 				solidityVersion,
-				compileArgs
+				compileArgs,
+				workingDirectory
 			});
 
 			if (!compileResult.success) {

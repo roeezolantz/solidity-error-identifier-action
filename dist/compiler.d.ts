@@ -6,6 +6,7 @@ export interface CompileOptions {
     compiler: 'hardhat' | 'foundry' | 'solc';
     solidityVersion?: string;
     compileArgs?: string;
+    workingDirectory?: string;
 }
 export interface CompileResult {
     artifactPaths: string[];

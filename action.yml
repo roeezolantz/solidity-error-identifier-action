@@ -29,7 +29,10 @@ inputs:
     description: '[Compile mode] Solidity version (e.g., "0.8.25"). Auto-detected if not specified.'
     required: false
   compile-args:
-    description: '[Compile mode] Additional compiler arguments (e.g., "--optimize")'
+    description: '[Compile mode] Additional compiler arguments (e.g., "--optimize"). Note: do not use --config here.'
+    required: false
+  working-directory:
+    description: '[Compile mode] Working directory containing hardhat.config.js/ts and package.json. If set, uses existing config instead of generating one.'
     required: false
 
   # Common inputs

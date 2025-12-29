@@ -88,6 +88,56 @@ module.exports = {
  */
 async function compileWithHardhat(options) {
     core.info('📦 Compiling with Hardhat...');
+    // If working directory is provided, use existing config
+    if (options.workingDirectory) {
+        const workDir = path.resolve(options.workingDirectory);
+        core.info(`Using existing Hardhat config in: ${workDir}`);
+        try {
+            // Find hardhat config
+            const configFiles = ['hardhat.config.ts', 'hardhat.config.js'];
+            let configPath = null;
+            for (const configFile of configFiles) {
+                const fullPath = path.join(workDir, configFile);
+                if (fs.existsSync(fullPath)) {
+                    configPath = fullPath;
+                    core.info(`Found config: ${configFile}`);
+                    break;
+                }
+            }
+            if (!configPath) {
+                throw new Error(`No hardhat.config.ts or hardhat.config.js found in ${workDir}`);
+            }
+            // Check if dependencies are installed
+            const nodeModulesPath = path.join(workDir, 'node_modules');
+            if (!fs.existsSync(nodeModulesPath)) {
+                core.info('Installing dependencies...');
+                (0, child_process_1.execSync)('npm install', { cwd: workDir, stdio: 'inherit' });
+            }
+            // Compile using existing config
+            core.info('Running Hardhat compile...');
+            const compileCmd = `npx hardhat compile ${options.compileArgs || ''}`;
+            (0, child_process_1.execSync)(compileCmd, { cwd: workDir, stdio: 'inherit' });
+            // Find artifacts directory from config
+            const artifactsDir = path.join(workDir, 'artifacts');
+            if (!fs.existsSync(artifactsDir)) {
+                throw new Error(`Artifacts directory not found at ${artifactsDir}`);
+            }
+            core.info(`✅ Compiled successfully using existing config.`);
+            return {
+                artifactPaths: [artifactsDir],
+                success: true
+            };
+        }
+        catch (error) {
+            core.error(`Compilation failed: ${error}`);
+            return {
+                artifactPaths: [],
+                success: false,
+                errors: [String(error)]
+            };
+        }
+    }
+    // Otherwise, use temp config approach (original behavior)
     // Detect or use provided Solidity version
     let solidityVersion = options.solidityVersion;
     if (!solidityVersion && options.contractPaths.length > 0) {
@@ -518,13 +568,15 @@ async function run() {
             const compiler = (core.getInput('compiler') || 'hardhat');
             const solidityVersion = core.getInput('solidity-version') || undefined;
             const compileArgs = core.getInput('compile-args') || undefined;
+            const workingDirectory = core.getInput('working-directory') || undefined;
             const contractPaths = contractPathsInput.split(',').map(p => p.trim());
             // Compile contracts
             const compileResult = await (0, compiler_1.compile)({
                 contractPaths,
                 compiler,
                 solidityVersion,
-                compileArgs
+                compileArgs,
+                workingDirectory
             });
             if (!compileResult.success) {
                 core.setFailed(`Compilation failed: ${compileResult.errors?.join(', ')}`);
