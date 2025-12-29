@@ -14,7 +14,7 @@ import { publishToNpm } from './npm-publisher';
 async function run(): Promise<void> {
 	try {
 		const mode = core.getInput('mode') || 'abi';
-		const outputPath = core.getInput('output-path') || 'errors.json';
+		const outputPath = core.getInput('output_path') || 'errors.json';
 
 		core.info('🔍 Solidity Error Identifier Action');
 		core.info('=====================================');
@@ -26,11 +26,11 @@ async function run(): Promise<void> {
 		// Handle different modes
 		if (mode === 'compile') {
 			// Compile mode: compile contracts first
-			const contractPathsInput = core.getInput('contract-paths', { required: true });
+			const contractPathsInput = core.getInput('contract_paths', { required: true });
 			const compiler = (core.getInput('compiler') || 'hardhat') as 'hardhat' | 'foundry' | 'solc';
-			const solidityVersion = core.getInput('solidity-version') || undefined;
-			const compileArgs = core.getInput('compile-args') || undefined;
-			const workingDirectory = core.getInput('working-directory') || undefined;
+			const solidityVersion = core.getInput('solidity_version') || undefined;
+			const compileArgs = core.getInput('compile_args') || undefined;
+			const workingDirectory = core.getInput('working_directory') || undefined;
 
 			const contractPaths = contractPathsInput.split(',').map(p => p.trim());
 
@@ -53,7 +53,7 @@ async function run(): Promise<void> {
 
 		} else if (mode === 'abi') {
 			// ABI mode: use existing ABIs
-			const abiPathsInput = core.getInput('abi-paths', { required: true });
+			const abiPathsInput = core.getInput('abi_paths', { required: true });
 			abiDirectories = abiPathsInput.split(',').map(p => p.trim());
 
 		} else {
@@ -111,24 +111,24 @@ async function run(): Promise<void> {
 		core.info(`Total: ${errorsWithSelectors.length} errors from ${errorsBySource.size} contracts`);
 
 		// Set outputs
-		core.setOutput('errors-json', outputFile);
-		core.setOutput('error-count', errorsWithSelectors.length);
-		core.setOutput('errors-by-source', JSON.stringify(Object.fromEntries(errorsBySource)));
+		core.setOutput('errors_json', outputFile);
+		core.setOutput('error_count', errorsWithSelectors.length);
+		core.setOutput('errors_by_source', JSON.stringify(Object.fromEntries(errorsBySource)));
 
 		// NPM Publishing (if enabled)
-		const publishNpm = core.getInput('publish-npm') === 'true';
+		const publishNpm = core.getInput('publish_npm') === 'true';
 		if (publishNpm) {
-			const npmPackageName = core.getInput('npm-package-name', { required: true });
-			const useProvenance = core.getInput('npm-provenance') === 'true';
-			const npmToken = core.getInput('npm-token') || undefined;
-			const npmBinaryName = core.getInput('npm-binary-name') || undefined;
-			const npmRegistry = core.getInput('npm-registry') || undefined;
-			const packageVersion = core.getInput('package-version') || undefined;
-			const packageDescription = core.getInput('package-description') || undefined;
+			const npmPackageName = core.getInput('npm_package_name', { required: true });
+			const useProvenance = core.getInput('npm_provenance') === 'true';
+			const npmToken = core.getInput('npm_token') || undefined;
+			const npmBinaryName = core.getInput('npm_binary_name') || undefined;
+			const npmRegistry = core.getInput('npm_registry') || undefined;
+			const packageVersion = core.getInput('package_version') || undefined;
+			const packageDescription = core.getInput('package_description') || undefined;
 
 			// Validate: either provenance or token must be provided
 			if (!useProvenance && !npmToken) {
-				core.setFailed('Either npm-provenance must be enabled or npm-token must be provided');
+				core.setFailed('Either npm_provenance must be enabled or npm_token must be provided');
 				return;
 			}
 
@@ -145,8 +145,8 @@ async function run(): Promise<void> {
 			});
 
 			if (publishResult.success) {
-				core.setOutput('npm-package-name', publishResult.packageName);
-				core.setOutput('npm-package-version', publishResult.version);
+				core.setOutput('npm_package_name', publishResult.packageName);
+				core.setOutput('npm_package_version', publishResult.version);
 			} else {
 				core.setFailed(`NPM publishing failed: ${publishResult.error}`);
 				return;

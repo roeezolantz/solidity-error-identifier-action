@@ -555,7 +555,7 @@ const npm_publisher_1 = __nccwpck_require__(8557);
 async function run() {
     try {
         const mode = core.getInput('mode') || 'abi';
-        const outputPath = core.getInput('output-path') || 'errors.json';
+        const outputPath = core.getInput('output_path') || 'errors.json';
         core.info('🔍 Solidity Error Identifier Action');
         core.info('=====================================');
         core.info(`Mode: ${mode}`);
@@ -564,11 +564,11 @@ async function run() {
         // Handle different modes
         if (mode === 'compile') {
             // Compile mode: compile contracts first
-            const contractPathsInput = core.getInput('contract-paths', { required: true });
+            const contractPathsInput = core.getInput('contract_paths', { required: true });
             const compiler = (core.getInput('compiler') || 'hardhat');
-            const solidityVersion = core.getInput('solidity-version') || undefined;
-            const compileArgs = core.getInput('compile-args') || undefined;
-            const workingDirectory = core.getInput('working-directory') || undefined;
+            const solidityVersion = core.getInput('solidity_version') || undefined;
+            const compileArgs = core.getInput('compile_args') || undefined;
+            const workingDirectory = core.getInput('working_directory') || undefined;
             const contractPaths = contractPathsInput.split(',').map(p => p.trim());
             // Compile contracts
             const compileResult = await (0, compiler_1.compile)({
@@ -587,7 +587,7 @@ async function run() {
         }
         else if (mode === 'abi') {
             // ABI mode: use existing ABIs
-            const abiPathsInput = core.getInput('abi-paths', { required: true });
+            const abiPathsInput = core.getInput('abi_paths', { required: true });
             abiDirectories = abiPathsInput.split(',').map(p => p.trim());
         }
         else {
@@ -636,22 +636,22 @@ async function run() {
         core.info('');
         core.info(`Total: ${errorsWithSelectors.length} errors from ${errorsBySource.size} contracts`);
         // Set outputs
-        core.setOutput('errors-json', outputFile);
-        core.setOutput('error-count', errorsWithSelectors.length);
-        core.setOutput('errors-by-source', JSON.stringify(Object.fromEntries(errorsBySource)));
+        core.setOutput('errors_json', outputFile);
+        core.setOutput('error_count', errorsWithSelectors.length);
+        core.setOutput('errors_by_source', JSON.stringify(Object.fromEntries(errorsBySource)));
         // NPM Publishing (if enabled)
-        const publishNpm = core.getInput('publish-npm') === 'true';
+        const publishNpm = core.getInput('publish_npm') === 'true';
         if (publishNpm) {
-            const npmPackageName = core.getInput('npm-package-name', { required: true });
-            const useProvenance = core.getInput('npm-provenance') === 'true';
-            const npmToken = core.getInput('npm-token') || undefined;
-            const npmBinaryName = core.getInput('npm-binary-name') || undefined;
-            const npmRegistry = core.getInput('npm-registry') || undefined;
-            const packageVersion = core.getInput('package-version') || undefined;
-            const packageDescription = core.getInput('package-description') || undefined;
+            const npmPackageName = core.getInput('npm_package_name', { required: true });
+            const useProvenance = core.getInput('npm_provenance') === 'true';
+            const npmToken = core.getInput('npm_token') || undefined;
+            const npmBinaryName = core.getInput('npm_binary_name') || undefined;
+            const npmRegistry = core.getInput('npm_registry') || undefined;
+            const packageVersion = core.getInput('package_version') || undefined;
+            const packageDescription = core.getInput('package_description') || undefined;
             // Validate: either provenance or token must be provided
             if (!useProvenance && !npmToken) {
-                core.setFailed('Either npm-provenance must be enabled or npm-token must be provided');
+                core.setFailed('Either npm_provenance must be enabled or npm_token must be provided');
                 return;
             }
             core.info('');
@@ -666,8 +666,8 @@ async function run() {
                 useProvenance: useProvenance
             });
             if (publishResult.success) {
-                core.setOutput('npm-package-name', publishResult.packageName);
-                core.setOutput('npm-package-version', publishResult.version);
+                core.setOutput('npm_package_name', publishResult.packageName);
+                core.setOutput('npm_package_version', publishResult.version);
             }
             else {
                 core.setFailed(`NPM publishing failed: ${publishResult.error}`);
@@ -953,6 +953,30 @@ async function publishToNpm(options) {
         fs.writeFileSync(path.join(packageDir, 'package.json'), JSON.stringify(packageJson, null, 2));
         // Copy errors.json
         fs.copyFileSync(options.errorsJson, path.join(packageDir, 'errors.json'));
+        // Read errors for README
+        const errorsData = JSON.parse(fs.readFileSync(options.errorsJson, 'utf-8'));
+        const errorsBySource = new Map();
+        errorsData.forEach((err) => {
+            const source = err.source || 'Unknown';
+            if (!errorsBySource.has(source)) {
+                errorsBySource.set(source, []);
+            }
+            errorsBySource.get(source).push(err);
+        });
+        // Generate error summary
+        let errorSummary = '';
+        const sortedSources = Array.from(errorsBySource.keys()).sort();
+        sortedSources.forEach((source) => {
+            const errors = errorsBySource.get(source);
+            errorSummary += `- **${source}**: ${errors.length} error${errors.length !== 1 ? 's' : ''}\n`;
+        });
+        // Generate unified error table with contract column
+        let errorTable = '\n| Selector | Name | Contract | Signature |\n';
+        errorTable += '|----------|------|----------|--------|\n';
+        errorsData.forEach((err) => {
+            const source = err.source || 'Unknown';
+            errorTable += `| \`${err.selector}\` | ${err.name} | ${source} | \`${err.signature}\` |\n`;
+        });
         // Create CLI
         fs.writeFileSync(path.join(packageDir, 'cli.js'), CLI_TEMPLATE);
         fs.chmodSync(path.join(packageDir, 'cli.js'), '755');
@@ -983,6 +1007,13 @@ npx ${binaryName} --list
 npx ${binaryName} --json 0x118cdaa7
 \`\`\`
 
+## Error Database
+
+This package contains **${errorsData.length} error${errorsData.length !== 1 ? 's' : ''}** from **${errorsBySource.size} contract${errorsBySource.size !== 1 ? 's' : ''}**:
+
+${errorSummary}
+## All Errors
+${errorTable}
 ## Generated by
 
 This package was automatically generated using [solidity-error-identifier-action](https://github.com/FhenixProtocol/solidity-error-identifier-action).
@@ -1006,20 +1037,10 @@ Version: ${version}
                 throw new Error('GitHub Actions OIDC is not available. Make sure "id-token: write" permission is set in the workflow.');
             }
             core.info('GitHub Actions OIDC environment detected');
-            // Get OIDC token from GitHub Actions
-            try {
-                core.info('Requesting OIDC token from GitHub Actions...');
-                const oidcToken = await core.getIDToken('npmjs.com');
-                core.info('OIDC token obtained successfully');
-                // Use OIDC token as auth token
-                fs.writeFileSync(npmrcPath, `//${registryHost}/:_authToken=\${NPM_OIDC_TOKEN}\n`);
-                // Store token in environment for npm to use
-                process.env.NPM_OIDC_TOKEN = oidcToken;
-            }
-            catch (error) {
-                core.error(`Failed to get OIDC token: ${error}`);
-                throw new Error('Failed to authenticate with OIDC. Make sure NPM Trusted Publishers is configured correctly.');
-            }
+            core.info('npm will automatically use OIDC for authentication via --provenance flag');
+            // Don't create .npmrc - let npm handle OIDC automatically
+            // When --provenance is used, npm will automatically detect GitHub Actions
+            // and use OIDC for authentication
         }
         core.info(`Publishing ${options.packageName}@${version}...`);
         if (options.useProvenance) {
@@ -1066,9 +1087,12 @@ Version: ${version}
         };
     }
     finally {
-        // Clean up
-        if (fs.existsSync(packageDir)) {
+        // Clean up (unless in test mode)
+        if (process.env.TEST_MODE !== 'true' && fs.existsSync(packageDir)) {
             fs.rmSync(packageDir, { recursive: true });
+        }
+        else if (process.env.TEST_MODE === 'true') {
+            core.info(`📁 Test mode: Preserving ${packageDir} for inspection`);
         }
     }
 }

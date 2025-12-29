@@ -13,75 +13,75 @@ inputs:
     default: 'abi'
 
   # ABI mode inputs
-  abi-paths:
+  abi_paths:
     description: '[ABI mode] Comma-separated list of ABI directory paths to scan (e.g., "artifacts/contracts")'
     required: false
 
   # Compile mode inputs
-  contract-paths:
+  contract_paths:
     description: '[Compile mode] Comma-separated list of .sol file or directory paths to compile'
     required: false
   compiler:
     description: '[Compile mode] Compiler to use: "hardhat", "foundry", or "solc"'
     required: false
     default: 'hardhat'
-  solidity-version:
+  solidity_version:
     description: '[Compile mode] Solidity version (e.g., "0.8.25"). Auto-detected if not specified.'
     required: false
-  compile-args:
+  compile_args:
     description: '[Compile mode] Additional compiler arguments (e.g., "--optimize"). Note: do not use --config here.'
     required: false
-  working-directory:
+  working_directory:
     description: '[Compile mode] Working directory containing hardhat.config.js/ts and package.json. If set, uses existing config instead of generating one.'
     required: false
 
   # Common inputs
-  output-path:
+  output_path:
     description: 'Path where the error database JSON should be written'
     required: false
     default: 'errors.json'
 
   # NPM Publishing inputs
-  publish-npm:
+  publish_npm:
     description: 'Publish the error database as an npm package with CLI tool (true/false)'
     required: false
     default: 'false'
-  npm-package-name:
+  npm_package_name:
     description: '[NPM] Package name to publish (e.g., "@myorg/error-identifier")'
     required: false
-  npm-binary-name:
+  npm_binary_name:
     description: '[NPM] Binary command name (e.g., "my-error-lookup"). Defaults to package name without scope.'
     required: false
-  npm-provenance:
+  npm_provenance:
     description: '[NPM] Enable NPM provenance (Trusted Publishing via OIDC). Recommended over using npm-token.'
     required: false
     default: 'false'
-  npm-token:
-    description: '[NPM] NPM authentication token for publishing (not needed if npm-provenance is enabled)'
+  npm_token:
+    description: '[NPM] NPM authentication token for publishing (not needed if npm_provenance is enabled)'
     required: false
-  npm-registry:
+  npm_registry:
     description: '[NPM] NPM registry URL'
     required: false
     default: 'https://registry.npmjs.org/'
-  package-version:
+  package_version:
     description: '[NPM] Package version (e.g., "1.0.0"). If not provided, will auto-increment patch version.'
     required: false
-  package-description:
+  package_description:
     description: '[NPM] Package description'
     required: false
     default: 'Error decoder for Solidity smart contracts'
 
 outputs:
-  errors-json:
+  errors_json:
     description: 'Path to the generated error database JSON file'
-  error-count:
+  error_count:
     description: 'Total number of errors extracted'
-  errors-by-source:
+  errors_by_source:
     description: 'JSON object with error counts grouped by source contract'
-  npm-package-name:
-    description: 'Published npm package name (if publish-npm was enabled)'
-  npm-package-version:
-    description: 'Published npm package version (if publish-npm was enabled)'
+  npm_package_name:
+    description: 'Published npm package name (if publish_npm was enabled)'
+  npm_package_version:
+    description: 'Published npm package version (if publish_npm was enabled)'
 
 runs:
   using: 'node20'
