@@ -304,10 +304,30 @@ Version: ${version}
 			fs.writeFileSync(npmrcPath, `//${registryHost}/:_authToken=\${NPM_TOKEN}\n`);
 		} else if (options.useProvenance) {
 			// When using NPM Trusted Publishers with OIDC (no token provided)
-			// npm will automatically use GitHub Actions OIDC for authentication
-			// We don't create .npmrc to allow npm to use its default OIDC flow
 			core.info('Using NPM Trusted Publishers with GitHub Actions OIDC');
-			core.info('No token provided - npm will use OIDC authentication automatically');
+
+			// Check if we have OIDC environment variables
+			if (!process.env.ACTIONS_ID_TOKEN_REQUEST_URL || !process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN) {
+				throw new Error('GitHub Actions OIDC is not available. Make sure "id-token: write" permission is set in the workflow.');
+			}
+
+			core.info('GitHub Actions OIDC environment detected');
+
+			// Get OIDC token from GitHub Actions
+			try {
+				core.info('Requesting OIDC token from GitHub Actions...');
+				const oidcToken = await core.getIDToken('npmjs.com');
+				core.info('OIDC token obtained successfully');
+
+				// Use OIDC token as auth token
+				fs.writeFileSync(npmrcPath, `//${registryHost}/:_authToken=\${NPM_OIDC_TOKEN}\n`);
+
+				// Store token in environment for npm to use
+				process.env.NPM_OIDC_TOKEN = oidcToken;
+			} catch (error) {
+				core.error(`Failed to get OIDC token: ${error}`);
+				throw new Error('Failed to authenticate with OIDC. Make sure NPM Trusted Publishers is configured correctly.');
+			}
 		}
 
 		core.info(`Publishing ${options.packageName}@${version}...`);
@@ -322,13 +342,20 @@ Version: ${version}
 			publishFlags.push('--provenance');
 		}
 
+		// Prepare environment with auth token
+		const publishEnv: NodeJS.ProcessEnv = {
+			...process.env
+		};
+
+		if (options.npmToken) {
+			publishEnv.NPM_TOKEN = options.npmToken;
+		}
+		// NPM_OIDC_TOKEN is already in process.env if OIDC was used
+
 		execSync(`npm publish ${publishFlags.join(' ')}`, {
 			cwd: packageDir,
 			stdio: 'inherit',
-			env: {
-				...process.env,
-				...(options.npmToken && { NPM_TOKEN: options.npmToken })
-			}
+			env: publishEnv
 		});
 
 		core.info('');
