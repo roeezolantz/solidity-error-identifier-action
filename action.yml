@@ -70,6 +70,9 @@ inputs:
     description: '[NPM] Package description'
     required: false
     default: 'Error decoder for Solidity smart contracts'
+  package_keywords:
+    description: '[NPM] Additional keywords for SEO/GEO (comma-separated, e.g., "defi,ethereum,web3")'
+    required: false
 
 outputs:
   errors_json:

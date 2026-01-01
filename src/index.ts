@@ -125,6 +125,7 @@ async function run(): Promise<void> {
 			const npmRegistry = core.getInput('npm_registry') || undefined;
 			const packageVersion = core.getInput('package_version') || undefined;
 			const packageDescription = core.getInput('package_description') || undefined;
+			const packageKeywords = core.getInput('package_keywords') || undefined;
 
 			// Validate: either provenance or token must be provided
 			if (!useProvenance && !npmToken) {
@@ -138,6 +139,7 @@ async function run(): Promise<void> {
 				binaryName: npmBinaryName,
 				version: packageVersion,
 				description: packageDescription,
+				keywords: packageKeywords,
 				errorsJson: outputFile,
 				npmToken: npmToken,
 				registry: npmRegistry,

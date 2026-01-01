@@ -6,6 +6,7 @@ export interface PublishOptions {
     binaryName?: string;
     version?: string;
     description?: string;
+    keywords?: string;
     errorsJson: string;
     npmToken?: string;
     registry?: string;
